@@ -1,4 +1,5 @@
-import { Flex, Input, Button, Stack, FormControl, FormLabel } from '@chakra-ui/react'
+import { Flex, Button, Stack } from '@chakra-ui/react'
+import { Input } from '../components/Form/Input'
 
 export default function Home() {
   return (
@@ -18,37 +19,19 @@ export default function Home() {
       flexDir="column"
     >
       <Stack spacing="4">
-        <FormControl>
-          <FormLabel htmlFor='email'>E-mail</FormLabel>
-          
-          <Input 
-            name='email'
-            type='email'
-            id='email'
-            focusBorderColor='pink.500'
-            bgColor="gray.900"
-            variant="filled"
-            _hover={{
-              bgColor: 'gray.900',
-            }}
-            size="lg"
-          />
-        </FormControl>
-        <FormControl>
-          <FormLabel htmlFor='password'>Password</FormLabel>
-          <Input 
-            name='password'
-            type='password'
-            id='password'
-            focusBorderColor='pink.500'
-            bgColor="gray.900"
-            variant="filled"
-            _hover={{
-              bgColor: 'gray.900',
-            }}
-            size="lg"
-          />
-        </FormControl>
+       
+       <Input 
+        name="email"
+        label="E-mail"
+        type="email"
+       />
+
+       <Input 
+        name="password"
+        label="Senha"
+        type="password"
+       />
+        
       </Stack>
       <Button 
       type='submit'
