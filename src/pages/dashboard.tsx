@@ -1,7 +1,7 @@
 import { Box, Flex, SimpleGrid, Text, theme } from '@chakra-ui/react'
 import { ApexOptions } from 'apexcharts';
-import { SideBar } from '../components/Sidebar'
-import { Header } from '../components/Header'
+import SideBar from '../components/Sidebar'
+import Header from '../components/Header'
 import  dynamic  from 'next/dynamic'
 
 const Chart = dynamic(() => import('react-apexcharts'), { ssr: false })
@@ -61,6 +61,12 @@ const series = [
   }
 ]
 
+const seriesTwo = [
+  {
+    name: 'series',
+    data: [40, 60, 25, 60, 45, 43, 50],
+  }
+]
 export default function Dashboard () {
   return (
     <Flex direction="column" h="100vh">
@@ -85,7 +91,7 @@ export default function Dashboard () {
             pb="4"
             >
                <Text fontSize="lg" mb="4">Taxa de abertura</Text>
-            <Chart type='area' options={options} series={series} />
+            <Chart type='area' options={options} series={seriesTwo} />
           </Box>
         </SimpleGrid>
       </Flex>
