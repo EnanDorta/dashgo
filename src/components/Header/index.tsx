@@ -8,6 +8,7 @@ import { RiMenuLine } from 'react-icons/ri';
 
 const Header = () => {
   const { onOpen } = useSidebarDrawer()
+  console.log(onOpen)
 
   const isWideVersion = useBreakpointValue({
     base: false,
