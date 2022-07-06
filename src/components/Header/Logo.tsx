@@ -1,10 +1,9 @@
 import { Text } from '@chakra-ui/react'
 
-const Teste = () => {
-  console.log('O log executou')
+const Logo = () => {
   return (
     <Text
-      fontSize="3xl"
+      fontSize={["2xl", "3xl"]}
       fontWeight="bold"
       letterSpacing="tight"
       w="64"
@@ -15,4 +14,4 @@ const Teste = () => {
   )
 }
 
-export default Teste
+export default Logo
