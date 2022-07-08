@@ -2,6 +2,7 @@ import { Box, Button, Flex, HStack, SimpleGrid, VStack } from "@chakra-ui/react"
 import { Input } from "../../components/Form/Input";
 import Header from "../../components/Header";
 import SideBar from "../../components/Sidebar";
+import Link from "next/link"
 
 const CreateUser = () => {
   return (
@@ -26,7 +27,9 @@ const CreateUser = () => {
 
           <Flex mt="8" justify="flex-end">
             <HStack spacing="4">
-              <Button colorScheme="whiteAlpha">Cancelar</Button>
+              <Link href={"/users"} passHref>
+                <Button as="a" colorScheme="whiteAlpha">Cancelar</Button>
+              </Link>
               <Button colorScheme="pink">Salvar</Button>
             </HStack>
           </Flex> 
