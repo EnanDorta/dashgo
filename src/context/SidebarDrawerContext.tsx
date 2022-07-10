@@ -17,6 +17,7 @@ export const SidebarDrawerProvider = ({ children }: SidebarDrawerProviderProps) 
 
   useEffect(() => {
     disclosure.onClose()
+    //eslint-disable-next-line
   }, [router.asPath])
 
   return (
