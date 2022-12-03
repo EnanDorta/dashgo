@@ -12,7 +12,6 @@ if (process.env.NODE_ENV === 'development') {
   makeServer();
 }
 
-
 function MyApp({ Component, pageProps }: AppProps) {
   return (
     <QueryClientProvider client={queryClient}>

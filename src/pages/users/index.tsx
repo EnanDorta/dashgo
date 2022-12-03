@@ -16,7 +16,7 @@ import {
   useBreakpointValue,
   Center,
   Spinner,
-  Link
+  Link,
 } from '@chakra-ui/react';
 import NextLink from 'next/link';
 import { RiAddLine, RiPencilLine } from 'react-icons/ri';
@@ -28,7 +28,7 @@ import { queryClient } from '../../service/queryClient';
 import { api } from '../../service/api';
 
 interface Users {
-  id: number;
+  id: string;
   name: string;
   email: string;
   createdAt: string;
@@ -44,12 +44,18 @@ const UserList = () => {
     lg: true,
   });
 
-  async function handlePrefetchUser(userId: number) {
-    await queryClient.prefetchQuery(['user', userId], async () => {
-      const response = await api.get(`users/${userId}`)
+  async function handlePrefetchUser(userId: string) {
+    await queryClient.prefetchQuery(
+      ['user', userId],
+      async () => {
+        const response = await api.get(`users/${userId}`);
 
-      return response.data 
-    })
+        return response.data;
+      },
+      {
+        staleTime: 1000 * 60 * 10, // 10 minutes
+      }
+    );
   }
 
   return (

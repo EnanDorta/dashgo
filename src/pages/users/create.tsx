@@ -1,4 +1,4 @@
-import { Box, Button, Flex, HStack, SimpleGrid, VStack } from '@chakra-ui/react';
+import { Box, Button, Flex, HStack, SimpleGrid, Spinner, VStack } from '@chakra-ui/react';
 import { Input } from '../../components/Form/Input';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
@@ -6,6 +6,9 @@ import Header from '../../components/Header';
 import SideBar from '../../components/Sidebar';
 import Link from 'next/link';
 import * as yup from 'yup';
+import { useMutation } from 'react-query';
+import { api } from '../../service/api';
+import { queryClient } from '../../service/queryClient';
 
 type CreateUserFormData = {
   name: string;
@@ -25,14 +28,31 @@ const CreateUserFormSchema = yup.object().shape({
 });
 
 const CreateUser = () => {
+  const CreateUser = useMutation(
+    async (user: CreateUserFormData) => {
+      const response = await api.post('users', {
+        user: {
+          ...user,
+          created_at: new Date(),
+        },
+      });
+
+      return response.data;
+    },
+    {
+      onSuccess: () => {
+        queryClient.invalidateQueries('users');
+      },
+    }
+  );
+
   const { register, handleSubmit, formState } = useForm({
     resolver: yupResolver(CreateUserFormSchema),
   });
-  const { errors, isSubmitting } = formState;
+  const { errors } = formState;
 
   const handleCreateUser: SubmitHandler<CreateUserFormData> = async (data) => {
-    await new Promise((resolve) => setTimeout(resolve, 2000));
-    console.log(data);
+    CreateUser.mutateAsync(data);
   };
 
   return (
@@ -67,7 +87,7 @@ const CreateUser = () => {
                   Cancelar
                 </Button>
               </Link>
-              <Button colorScheme="pink" i sLoading={isSubmitting} type="submit">
+              <Button colorScheme="pink" isLoading={CreateUser.isLoading} type="submit">
                 Salvar
               </Button>
             </HStack>
