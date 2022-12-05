@@ -43,12 +43,11 @@ const UpdateUserFormSchema = yup.object().shape({
   email: yup.string().required('O campo E-mail é obrigatório').email('E-mail inválido'),
 });
 
-const EditUserModal = ({ isOpen, onClose, updateUser }: EditProps) => {
+const EditUserModal = ({ isOpen, updateUser, onClose }: EditProps) => {
   const router = useRouter();
 
   const { register, handleSubmit, formState } = useForm({
     resolver: yupResolver(UpdateUserFormSchema),
-
     defaultValues: {
       name: updateUser.name,
       email: updateUser.email,
@@ -59,15 +58,13 @@ const EditUserModal = ({ isOpen, onClose, updateUser }: EditProps) => {
 
   const userUpdate = useMutation(
     async (data: UpdateUserFormData) => {
-      const response = await api.put(`users/${updateUser.id}`, {
-        user: {
-          name: data.name,
-          email: data.email,
-          created_at: new Date(),
-        },
-      });
-
-      if (response.status === 200) {
+      try {
+        await api.put(`users/${updateUser.id}`, {
+          user: {
+            name: data.name,
+            email: data.email,
+          },
+        });
         onClose();
         swal2
           .fire({
@@ -75,14 +72,13 @@ const EditUserModal = ({ isOpen, onClose, updateUser }: EditProps) => {
             icon: 'success',
           })
           .then(() => router.push('/users'));
-      } else {
+      } catch (e) {
+        console.log(e);
         swal2.fire({
           title: 'Houve um erro na criação do usuário',
           icon: 'error',
         });
       }
-      console.log(response);
-      return response.data;
     },
     {
       onSuccess: () => {
@@ -93,17 +89,6 @@ const EditUserModal = ({ isOpen, onClose, updateUser }: EditProps) => {
 
   const handleUpdateUser: SubmitHandler<UpdateUserFormData> = async (data) => {
     userUpdate.mutateAsync(data);
-
-    // await queryClient.prefetchQuery(['user', updateUser.id], async () => {
-    //   const response = await api.put(`users/${updateUser.id}`, {
-    //     user: {
-    //       name: data.name,
-    //       email: data.email,
-    //     }
-    //   });
-
-    //   console.log('res', response);
-    // });
   };
 
   return (
@@ -124,7 +109,13 @@ const EditUserModal = ({ isOpen, onClose, updateUser }: EditProps) => {
             </ModalBody>
 
             <ModalFooter>
-              <Button type="submit" border="none" bg="pink.500" fontWeight="bold" mr={3}>
+              <Button
+                type="submit"
+                bg="pink.500"
+                fontWeight="bold"
+                mr={3}
+                isLoading={userUpdate.isLoading}
+              >
                 Atualizar
               </Button>
             </ModalFooter>

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import {
   Box,
   Button,
@@ -29,6 +29,8 @@ import { useUsers } from '../../service/hooks/useUsers';
 import { queryClient } from '../../service/queryClient';
 import { api } from '../../service/api';
 import EditUserModal from '../../components/Modal/EditUserModal';
+import { useMutation } from 'react-query';
+import swal2 from 'sweetalert2';
 
 interface Users {
   id: string;
@@ -48,25 +50,61 @@ const UserList = () => {
 
   const { data, isLoading, isFetching, error } = useUsers(page);
 
-  console.log('data', data);
-
   const [updateUser, setUpdateUser] = useState<UpdateUser>({} as UpdateUser);
 
   const { isOpen, onOpen, onClose } = useDisclosure();
+
+  const deleteUser = useMutation(
+    async ({ id }: { id: string }) => {
+      try {
+        await api.delete(`users/${id}`);
+        onClose();
+        swal2.fire({
+          title: 'Usuário deletado com sucesso!',
+          icon: 'success',
+        });
+      } catch (e) {
+        console.log(e);
+        swal2.fire({
+          title: 'Houve um erro, tente novamente...',
+          icon: 'error',
+        });
+      }
+    },
+    {
+      onSuccess: () => {
+        queryClient.invalidateQueries('users');
+      },
+    }
+  );
 
   const isWideVersion = useBreakpointValue({
     base: false,
     lg: true,
   });
 
-  function handleUpdateUser({ id, name, email }: { id: string; name: string; email: string }) {
+  const handleUpdateUser = ({ id, name, email }: { id: string; name: string; email: string }) => {
     onOpen();
     setUpdateUser({
       id,
       name,
       email,
     });
-  }
+  };
+
+  const handleDeleteUser = async ({ id, name }: { id: string; name: string }) => {
+    const swalMessage = await swal2.fire({
+      title: 'Você tem certeza disso?',
+      text: `Essa ação irá excluir o usuário ${name}.`,
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Ok',
+      cancelButtonText: 'Cancelar',
+    });
+    if (swalMessage.isConfirmed) {
+      deleteUser.mutateAsync({ id });
+    }
+  };
 
   async function handlePrefetchUser(userId: string) {
     await queryClient.prefetchQuery(
@@ -177,7 +215,12 @@ const UserList = () => {
                         _hover={{
                           opacity: 0.7,
                         }}
-                        onClick={() => {}}
+                        onClick={() =>
+                          handleDeleteUser({
+                            id,
+                            name,
+                          })
+                        }
                       >
                         <BsFillTrashFill size="16" />
                       </Button>
