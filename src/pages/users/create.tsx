@@ -9,6 +9,8 @@ import * as yup from 'yup';
 import { useMutation } from 'react-query';
 import { api } from '../../service/api';
 import { queryClient } from '../../service/queryClient';
+import swal2 from 'sweetalert2';
+import { useRouter } from 'next/router';
 
 type CreateUserFormData = {
   name: string;
@@ -28,7 +30,7 @@ const CreateUserFormSchema = yup.object().shape({
 });
 
 const CreateUser = () => {
-  const CreateUser = useMutation(
+  const createUser = useMutation(
     async (user: CreateUserFormData) => {
       const response = await api.post('users', {
         user: {
@@ -37,6 +39,20 @@ const CreateUser = () => {
         },
       });
 
+      if (response.status === 201) {
+        swal2
+          .fire({
+            title: 'Usuário criado com sucesso',
+            icon: 'success',
+          })
+          .then(() => router.push('/users'));
+      } else {
+        swal2.fire({
+          title: 'Houve um erro na criação do usuário',
+          icon: 'error',
+        });
+      }
+      console.log(response);
       return response.data;
     },
     {
@@ -46,13 +62,15 @@ const CreateUser = () => {
     }
   );
 
+  const router = useRouter();
+
   const { register, handleSubmit, formState } = useForm({
     resolver: yupResolver(CreateUserFormSchema),
   });
   const { errors } = formState;
 
   const handleCreateUser: SubmitHandler<CreateUserFormData> = async (data) => {
-    CreateUser.mutateAsync(data);
+    createUser.mutateAsync(data);
   };
 
   return (
@@ -87,7 +105,7 @@ const CreateUser = () => {
                   Cancelar
                 </Button>
               </Link>
-              <Button colorScheme="pink" isLoading={CreateUser.isLoading} type="submit">
+              <Button colorScheme="pink" isLoading={createUser.isLoading} type="submit">
                 Salvar
               </Button>
             </HStack>

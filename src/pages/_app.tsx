@@ -7,6 +7,7 @@ import { ReactQueryDevtools } from 'react-query/devtools';
 import { SidebarDrawerProvider } from '../context/SidebarDrawerContext';
 import { makeServer } from '../service/miragejs';
 import { queryClient } from '../service/queryClient';
+import '../styles/swalGlobalStyles.css';
 
 if (process.env.NODE_ENV === 'development') {
   makeServer();

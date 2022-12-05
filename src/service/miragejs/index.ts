@@ -33,7 +33,7 @@ export function makeServer() {
     },
 
     seeds(server) {
-      server.createList('user', 5);
+      server.createList('user', 6);
     },
 
     routes() {
@@ -62,6 +62,7 @@ export function makeServer() {
       });
       this.get('/users/:id');
       this.post('/users');
+      this.put('/users/:id');
 
       this.namespace = '';
       this.passthrough();

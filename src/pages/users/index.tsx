@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   Box,
   Button,
@@ -17,21 +17,30 @@ import {
   Center,
   Spinner,
   Link,
+  useDisclosure,
 } from '@chakra-ui/react';
 import NextLink from 'next/link';
 import { RiAddLine, RiPencilLine } from 'react-icons/ri';
+import { BsFillTrashFill } from 'react-icons/bs';
 import Header from '../../components/Header';
 import Pagination from '../../components/Pagination';
 import SideBar from '../../components/Sidebar';
 import { useUsers } from '../../service/hooks/useUsers';
 import { queryClient } from '../../service/queryClient';
 import { api } from '../../service/api';
+import EditUserModal from '../../components/Modal/EditUserModal';
 
 interface Users {
   id: string;
   name: string;
   email: string;
-  createdAt: string;
+  created_at: string;
+}
+
+interface UpdateUser {
+  id: string;
+  name: string;
+  email: string;
 }
 
 const UserList = () => {
@@ -39,10 +48,25 @@ const UserList = () => {
 
   const { data, isLoading, isFetching, error } = useUsers(page);
 
+  console.log('data', data);
+
+  const [updateUser, setUpdateUser] = useState<UpdateUser>({} as UpdateUser);
+
+  const { isOpen, onOpen, onClose } = useDisclosure();
+
   const isWideVersion = useBreakpointValue({
     base: false,
     lg: true,
   });
+
+  function handleUpdateUser({ id, name, email }: { id: string; name: string; email: string }) {
+    onOpen();
+    setUpdateUser({
+      id,
+      name,
+      email,
+    });
+  }
 
   async function handlePrefetchUser(userId: string) {
     await queryClient.prefetchQuery(
@@ -60,6 +84,7 @@ const UserList = () => {
 
   return (
     <Box>
+      {isOpen && <EditUserModal isOpen={isOpen} onClose={onClose} updateUser={updateUser} />}
       <Header />
       <Flex w="100%" my="6" maxWidth={1480} mx="auto" px="6">
         <SideBar />
@@ -91,7 +116,8 @@ const UserList = () => {
                 </Th>
                 <Th>Usuário</Th>
                 {isWideVersion && <Th>Data de cadastro</Th>}
-                <Th width="8"></Th>
+                <Th width="8">Editar usuário</Th>
+                <Th>Deletar</Th>
               </Tr>
             </Thead>
             <Tbody>
@@ -112,38 +138,51 @@ const UserList = () => {
                   </Td>
                 </Tr>
               ) : (
-                data.users.map(({ id, email, createdAt, name }: Users) => (
-                  <>
-                    <Tr key={id}>
-                      <Td px={['4', '4', '6']}>
-                        <Checkbox colorScheme="pink" />
-                      </Td>
-                      <Td>
-                        <Box>
-                          <Link color="purple.400" onMouseEnter={() => handlePrefetchUser(id)}>
-                            <Text>{name}</Text>
-                          </Link>
-                          <Text fontSize="sm" color="gray.300">
-                            {email}
-                          </Text>
-                        </Box>
-                      </Td>
-                      {isWideVersion && <Td>{createdAt}</Td>}
-                      <Td>
-                        {isWideVersion && (
-                          <Button
-                            as="a"
-                            size="sm"
-                            fontSize="sm"
-                            colorScheme="purple"
-                            leftIcon={<Icon as={RiPencilLine} fontSize="16" />}
-                          >
-                            Editar
-                          </Button>
-                        )}
-                      </Td>
-                    </Tr>
-                  </>
+                data.users.map(({ id, email, created_at, name }: Users) => (
+                  <Tr key={id}>
+                    <Td px={['4', '4', '6']}>
+                      <Checkbox colorScheme="pink" />
+                    </Td>
+                    <Td>
+                      <Box>
+                        <Link color="purple.400" onMouseEnter={() => handlePrefetchUser(id)}>
+                          <Text>{name}</Text>
+                        </Link>
+                        <Text fontSize="sm" color="gray.300">
+                          {email}
+                        </Text>
+                      </Box>
+                    </Td>
+                    {isWideVersion && <Td>{created_at}</Td>}
+                    <Td>
+                      <Button
+                        size="sm"
+                        fontSize="sm"
+                        colorScheme="purple"
+                        cursor="pointer"
+                        onClick={() => handleUpdateUser({ id, name, email })}
+                        leftIcon={<Icon as={RiPencilLine} fontSize="16" />}
+                      >
+                        Editar
+                      </Button>
+                    </Td>
+                    <Td>
+                      <Button
+                        size="sm"
+                        ml="3"
+                        fontSize="sm"
+                        cursor="pointer"
+                        background="none"
+                        color="red.400"
+                        _hover={{
+                          opacity: 0.7,
+                        }}
+                        onClick={() => {}}
+                      >
+                        <BsFillTrashFill size="16" />
+                      </Button>
+                    </Td>
+                  </Tr>
                 ))
               )}
             </Tbody>
